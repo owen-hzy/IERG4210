@@ -17,7 +17,7 @@
 		<img src="images/ad.jpeg" alt="advertisement" />
 	</div>
 	</section>
+	<section><div class="fb-share-button" data-href="http://developers.facebook.com/docs/plugins/" data-type="button"></div></section>
 </article>
-		
 <?php readfile('footer.html'); ?>	
 

@@ -32,7 +32,7 @@ function ierg4210_login() {
 				$exp = time() + 3600 * 24 *3;
 				$token = array('em'=>$r['email'], 'exp'=>$exp, 'k'=>hash_hmac('sha1', $exp . $r['password'], $r['salt']));
 	
-				setcookie('auth', json_encode($token), $exp, '/', null, null, true);
+				setcookie('auth', json_encode($token), $exp, '/', null, true, true);
 				$_SESSION['auth'] = $token;
 				session_regenerate_id();
 				return true;
@@ -54,7 +54,7 @@ function ierg4210_logout() {
 	session_unset();
 	$params = session_get_cookie_params();
 	setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
-	setcookie('auth', '', time() -42000, '/', null, null, true);
+	setcookie('auth', '', time() -42000, '/', null, true, true);
 	
 	session_destroy();
 	return true;

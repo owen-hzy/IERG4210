@@ -10,9 +10,9 @@
 	</ul>
 	<div id="item_detail">	
 	</div>
+	<div class="fb-share-button" data-href="http://developers.facebook.com/docs/plugins/" data-type="button"></div>
 	</section>
 </div>
-	
 <?php readfile('footer.html'); ?>
 
 			

@@ -67,6 +67,7 @@ if ($paypal_reply == "VERIFIED")
 		$i += 1;
 	}	
 	$total = $_POST['mc_gross'];
+	$status = 'PAID';
 	
 	global $db;
 	$db = ierg4210_DBU();
@@ -101,12 +102,13 @@ if ($paypal_reply == "VERIFIED")
 	$digest = hash_hmac('sha1', $data, $t['salt']);
 	
 	if ($digest == $custom) {
-				
-		for ($j = 1; $j < $i; $j++) {
-			$q = $db->prepare('INSERT INTO txn (txn_id, pid, invoice, quantity, item_total_price) VALUES (:txn_id, :pid, :invoice, :quantity, :price)');
-			$q->execute(array(':txn_id'=>$txn_id, ':pid'=>$item_number[$j], ':invoice'=>$invoice, ':quantity'=>$quantity[$j], ':price'=>$price[$j]));
+		$q = $db->prepare('INSERT INTO txn (txn_id, invoice, pid, item_price, quantity, total, status) VALUES (:txn_id, :invoice, :pid, :item_price, :quantity, :total, :status)');
+		$q->execute(array(':txn_id'=>$txn_id, ':invoice'=>$invoice, ':pid'=>$item_number[1], ':item_price'=>$price[1], ':quantity'=>$quantity[1], ':total'=>$total, ':status'=>$status));
+		for ($j = 2; $j < $i; $j++) {
+			$q = $db->prepare('INSERT INTO txn (pid, item_price, quantity) VALUES (:pid, :item_price, :quantity)');
+			$q->execute(array(':pid'=>$item_number[$j], ':item_price'=>$price[$j], ':quantity'=>$quantity[$j]));
 		}
-		error_log(date(' [Y-m-d H:i e] ') . $txn_id . " Successfully Validated and Insert the transaction into database" . PHP_EOL, 3, "/var/www/html/php/ipn_log" );
+		error_log(date(' [Y-m-d H:i e] ') . $txn_id . " Successfully Validated and Paid" . PHP_EOL, 3, "/var/www/html/php/ipn_log" );
 		$db = null;
 		die();
 	}

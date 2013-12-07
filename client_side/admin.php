@@ -172,8 +172,11 @@ auth();
 		-->
 		
 	</section>
-
 <div class="clear"></div>
+<section id="OrderInfoPanel">
+<fieldset><legend>Order Info</legend><ul id="order_info"><li><span class="small">invoice</span><span class="medium">transaction_id</span><span class="small">total</span><span class="small">status</span></li></ul></fieldset>
+</section>
+<section id="OrderInfoDetail" class="hide"><fieldset><legend>Order Detail</legend><ul id="order_detail"></ul></fieldset></section>
 </article>
 
 <script type="text/javascript" src="../js/myLib.js"></script>

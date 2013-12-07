@@ -64,8 +64,8 @@ function ierg4210_buildOrder() {
 	$digest = hash_hmac('sha1', $data, $salt);
 			
 	$db = ierg4210_DBU();
-	$q = $db->prepare("INSERT INTO orders (digest, salt, total) VALUES (:digest, :salt, :total)");
-	$q->execute(array(':digest' => $digest, ':salt' => $salt, ':total' => $total));
+	$q = $db->prepare("INSERT INTO orders (digest, salt, quantity, price, total, status) VALUES (:digest, :salt, :quantity, :price, :total, :status)");
+	$q->execute(array(':digest' => $digest, ':salt' => $salt, ':quantity'=>json_encode($list_array), ':price'=>json_encode($result_array), ':total'=>$total, ':status'=>'Unpaid'));
 	
 	$lastId = $db->lastInsertId();
 	$back_array = array(0=>array("digest"=>$digest, "invoice"=>$lastId));

@@ -61,17 +61,15 @@ if ($paypal_reply == "VERIFIED")
 	while(!empty($_POST['item_number' . $i . '']))
 	{	
 		$item_number[$i] = $_POST['item_number' . $i . ''];
-		$quantity[$i] = $_POST['quantity' . $i . ''];
+		$quantity[$j] = $_POST['quantity' . $i . ''];
 		$price[$i] = $_POST['mc_gross_' . $i . ''];
-		
 		$i += 1;
 	}	
 	$total = $_POST['mc_gross'];
-	$status = 'PAID';
 	
 	global $db;
 	$db = ierg4210_DBU();
-	$q = $db->prepare('SELECT txn_id FROM txn WHERE txn_id=(:txn_id)');
+	$q = $db->prepare('SELECT txn_id FROM orders WHERE txn_id=(:txn_id)');
 	$q->execute(array(':txn_id'=>$txn_id));
 	$r = $q->fetch();
 	if (! empty($r['txn_id'])) {
@@ -90,6 +88,7 @@ if ($paypal_reply == "VERIFIED")
 		die();
 	}
 	
+		
 	$q = $db->prepare('SELECT salt FROM orders WHERE invoice=(:invoice)');
 	$q->execute(array(':invoice'=>$invoice));
 	$t = $q->fetch();
@@ -102,17 +101,16 @@ if ($paypal_reply == "VERIFIED")
 	$digest = hash_hmac('sha1', $data, $t['salt']);
 	
 	if ($digest == $custom) {
-		$q = $db->prepare('INSERT INTO txn (txn_id, invoice, pid, item_price, quantity, total, status) VALUES (:txn_id, :invoice, :pid, :item_price, :quantity, :total, :status)');
-		$q->execute(array(':txn_id'=>$txn_id, ':invoice'=>$invoice, ':pid'=>$item_number[1], ':item_price'=>$price[1], ':quantity'=>$quantity[1], ':total'=>$total, ':status'=>$status));
-		for ($j = 2; $j < $i; $j++) {
-			$q = $db->prepare('INSERT INTO txn (pid, item_price, quantity) VALUES (:pid, :item_price, :quantity)');
-			$q->execute(array(':pid'=>$item_number[$j], ':item_price'=>$price[$j], ':quantity'=>$quantity[$j]));
-		}
+		$q = $db->prepare('UPDATE orders SET txn_id=(:txn_id), status=(:status) WHERE invoice=(:invoice)');
+		$q->execute(array(':txn_id'=>$txn_id, ':status'=>'Paid', ':invoice'=>$invoice));
 		error_log(date(' [Y-m-d H:i e] ') . $txn_id . " Successfully Validated and Paid" . PHP_EOL, 3, "/var/www/html/php/ipn_log" );
 		$db = null;
 		die();
 	}
-    error_log(date(' [Y-m-d H:i e] ') . $txn_id . " Validation Failed" . PHP_EOL, 3, '/var/www/html/php/ipn_error_log');
+	
+	$q = $db->prepare('UPDATE orders SET txn_id=(:txn_id), status=(:status) WHERE invoice=(:invoice)');
+	$q->execute(array(':txn_id'=>$txn_id, ':status'=>'Invalid hash Detected', ':invoice'=>$invoice));
+    error_log(date(' [Y-m-d H:i e] ') . $txn_id . " Validation Failed, invalid hash detected" . PHP_EOL, 3, '/var/www/html/php/ipn_error_log');
 	$db = null;
 	die();
 }
@@ -120,11 +118,11 @@ if ($paypal_reply == "VERIFIED")
 // LOG INVALID POSTS FOR MANUAL INVESTIGATION AND INTERVENTION
 if ($paypal_reply == "INVALID")
 {
-    error_log(date(' [Y-m-d H:i e] ') . $txn_id . " " . 'INVALID', 3, '/var/www/html/php/ipn_log');
+    error_log(date(' [Y-m-d H:i e] ') . $txn_id . " " . "INVALID" . PHP_EOL, 3, '/var/www/html/php/ipn_log');
     die();
 }
 
 // OTHERWISE, PayPal RETURNED BAD DATA (OR INTERNET HTTP ERRORS OR TIMEOUT)
-error_log(date(' [Y-m-d H:i e] ') . $txn_id . " " . 'unknown', 3, '/var/www/html/php/ipn_log');
+error_log(date(' [Y-m-d H:i e] ') . $txn_id . " " . "UNKNOWN" . PHP_EOL, 3, '/var/www/html/php/ipn_log');
 die();
 ?>

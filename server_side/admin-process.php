@@ -352,6 +352,42 @@ function ierg4210_prod_edit() {
 	}
 	}
 }
+
+function ierg4210_get_order_info() {
+	/*DB manipulation*/
+	global $db;
+	$db = ierg4210_DBU();
+	$q = $db->prepare('SELECT invoice,txn_id,total,status FROM orders');
+	$q->execute();
+	return $q->fetchAll();
+}
+
+function ierg4210_get_order_detail() {
+	
+	$invoice = $_POST['invoice'];
+	global $db;
+	$db = ierg4210_DBU();
+	$q = $db->prepare('SELECT quantity, price FROM orders WHERE invoice = (:invoice)');
+	$q->execute(array(':invoice'=>$invoice));
+	$r = $q->fetch();
+	$quantity_array = json_decode($r['quantity'], true);
+	$price_array = json_decode($r['price'], true);
+	
+	$db = ierg4210_DB();
+	$tmp_array = array();
+	$i = 0;
+		foreach ($quantity_array as $key => $value) {
+		if (!is_numeric($key)) {
+			throw new exception('invalid-pid');
+		}
+		$q = $db->prepare('SELECT pid, name, thumbdir FROM products WHERE pid=(:pid)');
+		$q->execute(array(':pid'=>$key));
+		$r = $q->fetch();
+		$tmp_array += array($i=>array("pid"=>$r['pid'], "name"=>$r['name'], "thumbdir"=>'../' . $r['thumbdir'], "quantity"=>$value, "price"=>$price_array[$key]));
+		$i++;
+}
+	return $tmp_array;
+}
 	
 function auth() {
 	if (!empty($_SESSION['auth']))

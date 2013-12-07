@@ -38,7 +38,58 @@
 		});
 	}
 		
+	function updateOrderInfo() {
+		myLib.get({action:'get_order_info'}, function(json) {
+			if (json == 'redirect') {
+				alert('You need to login again');
+				top.location.href= 'login.php';
+			}
+			else {
+				for (var Items = [], i = 0, order; order = json[i]; i++) {
+					(Items.push('<li id="' + order.invoice + '"><span class="small first">' + order.invoice + '</span>'),
+					Items.push('<span class="medium">' + order.txn_id + '</span>'),
+					Items.push('<span class="small">' + order.total + '</span>'),
+					Items.push('<span class="small">' + order.status + '</span></li>'));
+				}
+				el('order_info').innerHTML += Items.join('');
+			}
+		});
+	}
+	updateOrderInfo();	
+	
+	el('order_info').onmouseover= function (e) {
+		if (e.target.tagName != 'SPAN' || e.target.className != 'small first') {
+			return false;
+		}
+		else {
+			
+		var target = e.target,
+		parent = target.parentNode,
+		id = target.parentNode.id;
 		
+		myLib.post({action: 'get_order_detail', invoice: id}, function (json) {
+			if(json == 'redirect') {
+					alert('You need to login again');
+					top.location.href = 'login.php';
+			}
+			else {
+				for (var a = [], e = 0, f; f = json[e]; e++) {
+					(a.push('<li><img src="' + f.thumbdir + '" alt="' + f.name.escapeHTML() + '" />'),
+					a.push('<span class="item_name">' + f.name.escapeHTML() + '</span>'),
+					a.push('<input type="number" disabled="true" min="0" max="99" maxlength="2" class="qty" value="' + parseInt(f.quantity) + '" />'),
+					a.push('<span class="item_price">$' + parseFloat(f.price) + '</span></li>'));
+				}
+				el('order_detail').innerHTML = a.join('');
+			}
+		});
+		el('OrderInfoDetail').show();
+		}
+	}
+
+	el('order_info').onmouseout = function () {
+		el('OrderInfoDetail').hide();
+	}
+	
 	el('categoryList').onclick = function(e) {
 		if (e.target.tagName != 'SPAN')
 			return false;

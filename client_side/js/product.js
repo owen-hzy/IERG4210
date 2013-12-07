@@ -24,8 +24,8 @@
 			var catid = el('prod_catid').value;
 			myLib.get2({action:'cat_fetchbyid', catid:catid}, function(json){
 				var cat = json[0], a = [];
-				(a.push('<li>'), a.push('<a href = "index.php">Home</a>'), a.push('</li>'),
-				a.push('<li class="active">'), a.push('<a href="product.php?catid=' + cat.catid + '"> >' + cat.name), a.push('</a></li>'));
+				(a.push('<li>'), a.push('<a href = "/">Home</a>'), a.push('</li>'),
+				a.push('<li class="active">'), a.push('<a href="/' + cat.catid + '-' + cat.name + '"> >' + cat.name), a.push('</a></li>'));
 					
 				el('sitemap').innerHTML = a.join('');
 			});

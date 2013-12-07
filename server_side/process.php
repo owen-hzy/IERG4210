@@ -83,6 +83,14 @@ function ierg4210_cat_fetchall() {
 	
 }
 
+function ierg4210_get_pic() {
+	global $db;
+	$db = ierg4210_DB();
+	$q = $db->prepare('SELECT pid, name, thumbdir FROM products ORDER BY RAND() LIMIT 6');
+	$q->execute();
+	return $q->fetchAll();
+}
+
 function ierg4210_cat_fetchbyid() {
 	
 	if (!is_numeric($_GET['catid']))

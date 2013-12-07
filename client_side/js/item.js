@@ -8,7 +8,7 @@
 				myLib.get2({action:'cat_fetchbyid', catid:item.catid}, function(json){
 					var cat = json[0], a = [];
 					(a.push('<li>'), a.push('<a href = "index.php">Home</a>'), a.push('</li>'),
-					a.push('<li>'), a.push('<a href = "product.php?catid=' + cat.catid + '">>' + cat.name + '</a>'), a.push('</li>'),
+					a.push('<li>'), a.push('<a href = "/' + cat.catid + '-' + cat.name + '">>' + cat.name + '</a>'), a.push('</li>'),
 					a.push('<li class="active">'), a.push('<a href="item-details.php?pid=' + item.pid + '">>' + item.name + '</a>'), a.push('</li>'));
 					el('sitemap').innerHTML = a.join('');
 				});

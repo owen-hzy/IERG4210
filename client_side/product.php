@@ -8,7 +8,7 @@
 	<div class="products_list"><!--procuct-list area-->
 		<ul id = "prod_lists">
 			<input type="hidden" id="prod_catid" value="<?php
-				echo htmlspecialchars($_GET['catid'], ENT_QUOTES | 'ENT_HTML%5');
+				echo htmlspecialchars((int)$_GET['catid'], ENT_QUOTES | 'ENT_HTML5');
 			?>" />
 		</ul>
 	</div>
